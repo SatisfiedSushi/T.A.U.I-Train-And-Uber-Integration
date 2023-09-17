@@ -9,6 +9,9 @@ app = Flask(__name__)
 def embed():
     start, end, mode, path_string, markers = map_inputs("5900 N Keating Ave", "5501 N Kedzie Ave", "driving")
     return render_template('embed.html', start=start, end=end, mode=mode, path=path_string, markers=markers, api_key=api_key)
+    #start = "5900 N Keating Ave"
+    #end = "5501 N Kedzie Ave"
+    #return render_template('input.html', start=start, end=end)
 
 if __name__ == '__main__':
     app.run(debug=True)

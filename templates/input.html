@@ -2,9 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FlaskBlog</title>
+    <title>Directions</title>
 </head>
 <body>
-   <h1>Welcome to FlaskBlog</h1>
+   <h1>Directions from {{ start }} to {{ end }}</h1>
 </body>
+<iframe
+  width="600"
+  height="450"
+  style="border:0"
+  loading="lazy"
+  allowfullscreen
+  referrerpolicy="no-referrer-when-downgrade"
+  src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM
+  &origin={{ start }}
+  &destination={{ end }}">
+</iframe>
 </html>
