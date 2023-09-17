@@ -1,25 +1,54 @@
 import googlemaps
 from datetime import datetime
 
+# Gets directions from one location to another
+
 gmaps = googlemaps.Client(key='AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
 
-# Geocoding an address
-geocode_result = gmaps.geocode('1600 Amphitheatre Parkway, Mountain View, CA')
+'''
+#define locations
+start = "4419 N Lamon Ave, Chicago, IL 60630"
+end = "Jefferson Park Blue Line Station, Chicago, IL"
 
-# Look up an address with reverse geocoding
-reverse_geocode_result = gmaps.reverse_geocode((40.714224, -73.961452))
+# Get directions
+directions_result = None
+try:
+    directions_result = gmaps.directions(start, end, mode="transit", departure_time=datetime.now())
 
-# Request directions via public transit
-now = datetime.now()
-directions_result = gmaps.directions("Sydney Town Hall",
-                                     "Parramatta, NSW",
-                                     mode="transit",
-                                     departure_time=now)
+    # The result is a list of directions
+    for direction in directions_result:
+        for step in direction['legs'][0]['steps']:
+            print(step['html_instructions'])
+except:
+    print("Error: Invalid location(s)")'''
 
-# Validate an address with address validation
-addressvalidation_result =  gmaps.addressvalidation(['1600 Amphitheatre Pk'],
-                                                    regionCode='US',
-                                                    locality='Mountain View',
-                                                    enableUspsCass=True)
+# Gets distance matrix between two locations
 
-print(addressvalidation_result)
+'''def compute_routes_matrix(start, end, mode_="transit"):
+    try:
+        directions_result = gmaps.distance_matrix(start, end, mode=mode_, departure_time=datetime.now())
+        return directions_result
+    except:
+        print("Error: Invalid location(s)")
+        return None
+
+print(compute_routes_matrix("4419 N Lamon Ave, Chicago, IL 60630", "Jefferson Park Blue Line Station, Chicago, IL", "transit"))'''
+
+import requests
+import json
+
+def get_directions(origin, destination, api_key):
+    url = f"https://maps.googleapis.com/maps/api/directions/json?origin={origin}&destination={destination}&alternatives=true&key={api_key}"
+    response = requests.get(url)
+    data = response.json()
+    if 'routes' in data:
+        for i, route in enumerate(data['routes']):
+            print(f"Route {i + 1}:")
+            for leg in route['legs']:
+                print(f"  Distance: {leg['distance']['text']}")
+                print(f"  Duration: {leg['duration']['text']}")
+    else:
+        print("No routes found.")
+
+get_directions("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
+
