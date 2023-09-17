@@ -11,11 +11,11 @@ gmaps = googlemaps.Client(api_key)
 # Function to decode polyline points
 def decode_polyline(polyline_str):
     return polyline.decode(polyline_str)
-def map_inputs(start, end, mode):
-    start, end, mode = start, end, mode
+def map_inputs(start, end):
+    start, end = start, end
 
     # Get directions
-    directions = gmaps.directions(start, end, mode=mode)
+    directions = gmaps.directions(start, end)
 
     # Extract the path from the directions response
     path = []
@@ -41,5 +41,5 @@ def map_inputs(start, end, mode):
     markers = f'markers=color:{start_marker_color}|label:{start_label}|{start_location["lat"]},{start_location["lng"]}&'
     markers += f'markers=color:{end_marker_color}|label:{end_label}|{end_location["lat"]},{end_location["lng"]}'
 
-    return start, end, mode, path_string, markers
+    return start, end, path_string, markers
 
