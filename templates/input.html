@@ -41,16 +41,18 @@
         <br>
         <input type="submit" value="Get Directions">
     </form>
+    {% if start and end %}
     <h1>Directions from {{ start }} to {{ end }}</h1>
     <iframe
-          width="100%"
-          height="450"
-          style="border:0"
-          loading="lazy"
-          allowfullscreen
-          src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM
-          &origin={{ start }}
-          &destination={{ end }}">
-        </iframe>
+        width="100%"
+        height="450"
+        style="border:0"
+        loading="lazy"
+        allowfullscreen
+        src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
+        &origin={{ start }}
+        &destination={{ end }}">
+    </iframe>
+    {% endif %}
 </body>
 </html>
