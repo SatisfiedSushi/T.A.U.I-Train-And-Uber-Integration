@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Static Map with Custom Path and Traffic Layer</title>
+</head>
+<body>
+    <h1>Directions from {{ start }} to {{ end }}</h1>
+    <img src="https://maps.googleapis.com/maps/api/staticmap?size=600x400&path={{ path }}&{{ markers }}&traffic:yes&key={{ api_key }}" alt="Static Map">
+</body>
+</html>
