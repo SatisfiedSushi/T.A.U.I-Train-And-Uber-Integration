@@ -105,24 +105,39 @@ def get_place_id(address, api_key):
 
 # print(get_place_id("5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM"))
 
-# returns CTA stop id for a given train station (returns it in a format that CTA api can use)
-def get_CTA_station_id(lat, lng, api_key):
-    places_api = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius=1500&type=train_station&key={api_key}"
+# uses CTA api to get trainstations in a radius and their arrival times
+def get_nearby_train_stations(location, radius, google_api_key):
+    lat, lng = get_lat_lng_from_address(location, google_api_key).split(',')
+    places_api = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius={radius}&type=train_station&key={google_api_key}"
     response = requests.get(places_api)
     data = response.json()
 
-    if 'results' in data and len(data['results']) > 0:
-        return data['results'][0]['place_id']
+    if 'results' in data:
+        return [result['name'] for result in data['results']]
     else:
-        return None
+        return []
+
+def get_train_arrivals(cta_api_key, stpid):
+    api_url = f"http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key={cta_api_key}&stpid={stpid}&outputType=JSON"
+    response = requests.get(api_url)
+    data = response.json()
+
+    if 'ctatt' in data and 'eta' in data['ctatt']:
+        return [eta['arrT'] for eta in data['ctatt']['eta']]
+    else:
+        return []
 
 # Example usage:
-place_id = get_place_id(41.8781, -87.6298, "YOUR_API_KEY")
-print(f"The place ID is {place_id}")
+stations = get_nearby_train_stations("5024 w argyle", 1000000, "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
+for station in stations:
+    arrivals = get_train_arrivals("4a8cc4d9702a4087af064b1fc18f00d9", station)
+    print(f"Station: {station}")
+    print(f"Arrivals: {arrivals}")
 
 # uses cta api to get departure times for a given train station
-def get_departure_times(train_station, api_key):
-    place_id = get_CTA_station_id(train_station, api_key)
+def get_departure_times(train_line, api_key):
+    place_id = None
+        #get_CTA_train_stations(train_line, api_key)
     cta_api = f"http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key={api_key}&mapid={place_id}&outputType=JSON"
     response = requests.get(cta_api)
     data = response.json()
@@ -134,4 +149,4 @@ def get_departure_times(train_station, api_key):
     else:
         print("No departure times found.")
 
-# get_departure_times("Schiller Park Train Station", "4a8cc4d9702a4087af064b1fc18f00d9")
+# get_departure_times("blue", "4a8cc4d9702a4087af064b1fc18f00d9")
