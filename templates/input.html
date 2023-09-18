@@ -69,15 +69,16 @@
         <input id = "click-box" type="submit" value="Get Directions">
     </form>
     {% if start and end %}
-    <h1>Directions from {{ start }} to {{ end }}</h1>
-    <iframe
-        style="border:0"
-        loading="lazy"
-        allowfullscreen
-        src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
-        &origin={{ start }}
-        &destination={{ end }}">
-    </iframe>
+        <h1>Directions from {{ start }} to {{ end }}</h1>
+        <a href="https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}">Call an Uber</a>
+        <iframe
+            style="border:0"
+            loading="lazy"
+            allowfullscreen
+            src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
+            &origin={{ start }}
+            &destination={{ end }}">
+        </iframe>
     {% endif %}
 </body>
 </html>

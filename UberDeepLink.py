@@ -1,21 +1,17 @@
-import GoogleMapsAPIs as gmaps
-import requests
+import googlemaps
 
-request = requests.post("http://taui.pythonanywhere.com/")
+def addy_to_lat_long(start, end, api_key):
+    # Initialize the Google Maps client
+    gmaps = googlemaps.Client(api_key)
 
-def addy_to_lat_long(start, end):
+    # Geocode the start and end addresses
+    start_geocode = gmaps.geocode(start)
+    end_geocode = gmaps.geocode(end)
 
-    origin = start
-    destination = end
+    # Extract latitude and longitude from the geocode results
+    start_lat = start_geocode[0]['geometry']['location']['lat']
+    start_lng = start_geocode[0]['geometry']['location']['lng']
+    end_lat = end_geocode[0]['geometry']['location']['lat']
+    end_lng = end_geocode[0]['geometry']['location']['lng']
 
-    start_long_lat = gmaps.get_lat_lng_from_address(origin, 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
-    start_long_lat = start_long_lat.split(",")
-    start_long = start_long_lat[1]
-    start_lat = start_long_lat[0]
-
-    end_long_lat = gmaps.get_lat_lng_from_address(destination, 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
-    end_long_lat = end_long_lat.split(",")
-    end_long = end_long_lat[1]
-    end_lat = end_long_lat[0]
-
-    return start_lat, start_long, end_lat, end_long, origin, destination
+    return start_lat, start_lng, end_lat, end_lng
