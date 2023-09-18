@@ -133,6 +133,8 @@ for station in stations:
     arrivals = get_train_arrivals("4a8cc4d9702a4087af064b1fc18f00d9", station)
     print(f"Station: {station}")
     print(f"Arrivals: {arrivals}")
+place_id = get_place_id(41.8781, -87.6298)
+print(f"The place ID is {place_id}")
 
 # uses cta api to get departure times for a given train station
 def get_departure_times(train_line, api_key):
