@@ -117,7 +117,7 @@ def get_CTA_station_id(lat, lng, api_key):
         return None
 
 # Example usage:
-place_id = get_place_id(41.8781, -87.6298, "YOUR_API_KEY")
+place_id = get_place_id(41.8781, -87.6298)
 print(f"The place ID is {place_id}")
 
 # uses cta api to get departure times for a given train station
