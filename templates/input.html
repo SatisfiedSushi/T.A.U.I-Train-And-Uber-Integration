@@ -1,21 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Address Autocomplete</title>
+    <title>TAUI</title>
     <style>
         /* Style for the input boxes */
-        html {
+        *{
+            font-family: "Lucida Console", "Arial", sans-serif;
+        }
+        html, label {
             background-color: #1F2833;
         }
-        input[type="text"] {
+        input[type="text"], #click-box{
             width: 100%;
             padding: 10px; /* Adjust the padding for your desired size */
             margin-bottom: 10px;
-            border: 1px solid #ccc;
+            border: 5px solid #AADAFF;
             border-radius: 5px;
+            background-color: #1F2833;
         }
-        h1, label {
+        h1, label, input {
             color: #AADAFF;
+        }
+        #title {
+            font-size: 100px;
+            margin-top: 0;
+            margin-bottom: 5px;
         }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
@@ -31,7 +40,7 @@
     </script>
 </head>
 <body>
-    <h1>Address Autocomplete</h1>
+    <h1 id = title>TAUI</h1>
     <form method="POST">
         <label for="start-input">Start Address:</label>
         <input id="start-input" type="text" name="start" class="input-box">
@@ -39,7 +48,7 @@
         <label for="end-input">End Address:</label>
         <input id="end-input" type="text" name="end" class="input-box">
         <br>
-        <input type="submit" value="Get Directions">
+        <input id = "click-box" type="submit" value="Get Directions">
     </form>
     {% if start and end %}
     <h1>Directions from {{ start }} to {{ end }}</h1>
