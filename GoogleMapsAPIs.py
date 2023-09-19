@@ -1,14 +1,32 @@
 import pandas as pd
 import pprint
+
+import requests
+import datetime
+from fuzzywuzzy import fuzz
+
+
 df = pd.read_excel('CTA train addresses.xlsx')
-google_maps_place_IDs = df['gmaps place id'].tolist()
+station_names = df['station name'].tolist()
 cta_station_IDs = df['cta station id'].tolist()
 
 # convert to dict
-cta_to_gmaps_ID_mapping = dict(zip(google_maps_place_IDs, cta_station_IDs))
+cta_to_gmaps_ID_mapping = dict(zip(station_names, cta_station_IDs))
 # Gets directions from one location to another
 
 # gmaps = googlemaps.Client(key='AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
+
+def find_closest_matching_string_with_fuzzywuzzy(string, list_of_strings):
+    highest_score = 0
+    closest_match = None
+    for str in list_of_strings:
+        score = fuzz.ratio(string, str)
+        if score > highest_score:
+            highest_score = score
+            closest_match = str
+    return closest_match, highest_score
+
+# print(f'Closest string: {find_closest_matching_string_with_fuzzywuzzy("Jackson & Austin Terminal, Northeastbound, Bus Terminal", cta_to_gmaps_ID_mapping.keys())}')
 
 '''
 #define locations
@@ -38,12 +56,59 @@ except:
         return None
 
 print(compute_routes_matrix("4419 N Lamon Ave, Chicago, IL 60630", "Jefferson Park Blue Line Station, Chicago, IL", "transit"))'''
-
-import requests
-import datetime
-
 def convert_miles_to_meters(miles):
     return miles * 1609.34
+
+def get_cta_data_of_Station(station_id, api_key):
+    api_url = f"http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key={api_key}&mapid={station_id}&outputType=JSON"
+    response = requests.get(api_url)
+    data = response.json()
+    # print(data)
+    trains = []
+
+    # print all child stations and their ids and arrivals
+    if 'ctatt' in data and 'eta' in data['ctatt']:
+        for i, eta in enumerate(data['ctatt']['eta']):
+            '''print(f"Train {i + 1}:")
+            print(f"  stpId: {eta['stpId']}")
+            print(f"  Direction: {'Northbound' if eta['trDr'] == '1' else 'Southbound'}")
+            print(f"  Destination: {eta['destNm']}")
+            print(f"  Arrival Time: {eta['arrT']}")
+            print(f"  Run Number: {eta['rn']}")'''
+            trains.append({'stpId': eta['stpId'], 'Direction': 'Northbound' if eta['trDr'] == '1' else 'Southbound', 'Destination': eta['destNm'], 'Arrival Time': eta['arrT'], 'Run Number': eta['rn']})
+
+        print(trains)
+        return trains
+
+def get_common_run_number(origin_station_id, destination_station_id, api_key):
+    origin_trains = get_cta_data_of_Station(origin_station_id, api_key) # list of trains
+    destination_trains = get_cta_data_of_Station(destination_station_id, api_key) # list of trains
+    common_trains = []
+    for origin_train in origin_trains:
+        for destination_train in destination_trains:
+            if origin_train['Run Number'] == destination_train['Run Number']:
+                common_trains.append(origin_train)
+
+    if len(common_trains) == 0:
+        print("No common trains found.")
+        return
+    else:
+        print(f"Common trains: {common_trains}")
+        fastest_train = common_trains[0]
+        fastest_time = datetime.datetime.max
+        for train in common_trains:
+            arrival_time = datetime.datetime.strptime(train['Arrival Time'], "%Y-%m-%dT%H:%M:%S")
+            if arrival_time < fastest_time:
+                fastest_time = arrival_time
+                fastest_train = train
+        print(f"Fastest train: {fastest_train}")
+        print(f"Fastest time: {fastest_time}")
+        return fastest_train['Run Number']
+
+get_common_run_number(40370, 41330, "4a8cc4d9702a4087af064b1fc18f00d9")
+
+'''print(get_cta_data_of_Station(41330, "4a8cc4d9702a4087af064b1fc18f00d9"))
+print(get_cta_data_of_Station(40370, "4a8cc4d9702a4087af064b1fc18f00d9"))'''
 
 def get_routes(origin, destination, api_key):
     gmaps_directions_api = f"https://maps.googleapis.com/maps/api/directions/json?origin={origin}&destination={destination}&alternatives=true&key={api_key}"
@@ -96,19 +161,18 @@ def get_nearest_trains_in_radius(radius, address, api_key):
     response = requests.get(gmaps_places_api)
     data = response.json()
 
-    print(data)
-
     if 'results' in data:
         for i, result in enumerate(data['results']):
-            if result['place_id'] in cta_to_gmaps_ID_mapping:
+            if find_closest_matching_string_with_fuzzywuzzy(result['name'], cta_to_gmaps_ID_mapping.keys())[1] > 70:
                 '''print(f"Train Station {i + 1}:")
                 print(f"  Name: {result['name']}")
                 print(f"  Place ID: {result['place_id']}")
                 print(f"  Station ID: {cta_to_gmaps_ID_mapping[result['place_id']]}")'''
-                nearest_stations.append((result['name'], result['place_id'], cta_to_gmaps_ID_mapping[result['place_id']]))
+                nearest_stations.append((find_closest_matching_string_with_fuzzywuzzy(result['name'], cta_to_gmaps_ID_mapping.keys())[0], result['place_id'], cta_to_gmaps_ID_mapping[find_closest_matching_string_with_fuzzywuzzy(result['name'], cta_to_gmaps_ID_mapping.keys())[0]]))
             else:
                 continue
 
+        print(f'Nearest stations: {nearest_stations}')
         return nearest_stations
     else:
         print("No train stations found.")
@@ -168,6 +232,8 @@ def get_train_arrivals(cta_api_key, stpid):
     else:
         return []
 
+# print(get_train_arrivals("4a8cc4d9702a4087af064b1fc18f00d9", 40680))
+
 # Example usage:
 '''stations = get_nearby_train_stations("5024 w argyle", 1000000, "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 for station in stations:
@@ -192,18 +258,31 @@ def get_departure_times(train_line, api_key):
     else:
         print("No departure times found.")
 
-def get_fastest_common_train_station(origin, destination, api_key):
-    origin_stations = get_nearest_trains_in_radius(100, origin, api_key)
-    destination_stations = get_nearest_trains_in_radius(100, destination, api_key)
-    print(origin_stations)
-    print(destination_stations)
-    for origin_station in origin_stations:
-        for destination_station in destination_stations:
-            if origin_station == destination_station:
-                return origin_station
-    return None
+# gets the fastest common train station between two locations and in their radii
+def get_fastest_common_train(origin, destination, api_key):
+    origin_stations = get_nearest_trains_in_radius(1,origin,  api_key)
+    destination_stations = get_nearest_trains_in_radius(1, destination, api_key)
+    common_stations = list(set(origin_stations) & set(destination_stations))
+    if len(common_stations) == 0:
+        print("No common stations found.")
+        return
+    else:
+        print(f"Common stations: {common_stations}")
+        fastest_station = common_stations[0]
+        fastest_time = datetime.datetime.max
+        for station in common_stations:
+            arrivals = get_train_arrivals("4a8cc4d9702a4087af064b1fc18f00d9", station)
+            if len(arrivals) > 0:
+                arrival_time = datetime.datetime.strptime(arrivals[0], "%Y-%m-%dT%H:%M:%S")
+                if arrival_time < fastest_time:
+                    fastest_time = arrival_time
+                    fastest_station = station
+        print(f"Fastest station: {fastest_station}")
+        print(f"Fastest time: {fastest_time}")
 
-get_fastest_common_train_station("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
+
+
+get_fastest_common_train("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
 def map_station_cta2googlemaps(excel_path, api_key):
     df = pd.read_excel(excel_path)
