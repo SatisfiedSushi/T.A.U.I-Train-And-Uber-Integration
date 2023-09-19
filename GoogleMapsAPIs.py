@@ -1,5 +1,7 @@
 import googlemaps
 from datetime import datetime
+import pandas as pd
+import time
 
 # Gets directions from one location to another
 
@@ -55,6 +57,17 @@ def get_routes(origin, destination, api_key):
 
 # get_routes("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
+def get_address_from_name(name, api_key):
+    gmaps_places_api = f"https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={name}&inputtype=textquery&fields=formatted_address&key={api_key}"
+    response = requests.get(gmaps_places_api)
+    data = response.json()
+    if 'candidates' in data and len(data['candidates']) > 0:
+        return data['candidates'][0]['formatted_address']
+    else:
+        return None
+
+# get_address_from_name("Northside College Preparatory Highschool",'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
+
 def get_lat_lng_from_address(address, api_key):
     geocode_api = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
     response = requests.get(geocode_api)
@@ -64,6 +77,8 @@ def get_lat_lng_from_address(address, api_key):
         return f"{location['lat']},{location['lng']}"
     else:
         return None
+
+#get_lat_lng_from_address(get_address_from_name("Jackson & Austin Terminal, Northeastbound, Bus Terminal", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM"), "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
 def get_nearest_trains_in_radius(radius, address, api_key):
     radius = convert_miles_to_meters(radius)
@@ -88,9 +103,20 @@ def get_nearest_trains_in_radius(radius, address, api_key):
 
 # get_nearest_trains_in_radius(10,"5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
-def get_place_id(address, api_key):
-    location = get_lat_lng_from_address(address, api_key)
+def get_place_id(address, api_key, type="Train Station"):
+    '''old_address = address
+    address = f'{address} {type}'
+    print(address)'''
+    location = get_lat_lng_from_address("19 N. Dearborn St., Chicago, IL 60602", api_key)
     if location is None:
+        '''if type == "Train Station":
+            return get_place_id(old_address, api_key, "Subway Station")
+        if type == "Subway Station":
+            return get_place_id(old_address, api_key, "Station")
+        if type == "Station":
+            return get_place_id(old_address, api_key, "CTA Train Station")
+        if type == "CTA Train Station":
+            return get_place_id(old_address, api_key, "CTA Subway Station")'''
         print("Unable to get location from address.")
         return
 
@@ -102,6 +128,9 @@ def get_place_id(address, api_key):
         return data['results'][0]['place_id']
     else:
         return None
+
+
+# print(get_place_id(f'Lake', "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM"))
 
 # print(get_place_id("5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM"))
 
@@ -128,13 +157,13 @@ def get_train_arrivals(cta_api_key, stpid):
         return []
 
 # Example usage:
-stations = get_nearby_train_stations("5024 w argyle", 1000000, "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
+'''stations = get_nearby_train_stations("5024 w argyle", 1000000, "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 for station in stations:
     arrivals = get_train_arrivals("4a8cc4d9702a4087af064b1fc18f00d9", station)
     print(f"Station: {station}")
     print(f"Arrivals: {arrivals}")
 place_id = get_place_id(41.8781, -87.6298)
-print(f"The place ID is {place_id}")
+print(f"The place ID is {place_id}")'''
 
 # uses cta api to get departure times for a given train station
 def get_departure_times(train_line, api_key):
@@ -151,4 +180,13 @@ def get_departure_times(train_line, api_key):
     else:
         print("No departure times found.")
 
+def map_station_cta2googlemaps(excel_path, api_key):
+    df = pd.read_excel(excel_path)
+    df['googlemaps'] = df.apply(lambda row: get_place_id(f'{row.iloc[0]}', api_key), axis=1)
+    df.to_excel('CTA train addresses.xlsx')
+
+# map_station_cta2googlemaps('CTA train stpids.xlsx', 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM') # DONT EVER RUN THIS UN LESS YOU UNDERSTAND IT
+
 # get_departure_times("blue", "4a8cc4d9702a4087af064b1fc18f00d9")
+
+
