@@ -1,8 +1,11 @@
-import googlemaps
-from datetime import datetime
 import pandas as pd
-import time
+import pprint
+df = pd.read_excel('CTA train addresses.xlsx')
+google_maps_place_IDs = df['gmaps place id'].tolist()
+cta_station_IDs = df['cta station id'].tolist()
 
+# convert to dict
+cta_to_gmaps_ID_mapping = dict(zip(google_maps_place_IDs, cta_station_IDs))
 # Gets directions from one location to another
 
 # gmaps = googlemaps.Client(key='AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
@@ -83,6 +86,8 @@ def get_lat_lng_from_address(address, api_key):
 def get_nearest_trains_in_radius(radius, address, api_key):
     radius = convert_miles_to_meters(radius)
     location = get_lat_lng_from_address(address, api_key)
+    nearest_stations = []
+
     if location is None:
         print("Unable to get location from address.")
         return
@@ -95,9 +100,16 @@ def get_nearest_trains_in_radius(radius, address, api_key):
 
     if 'results' in data:
         for i, result in enumerate(data['results']):
-            print(f"Train Station {i + 1}:")
-            print(f"  Name: {result['name']}")
-            print(f"  Location: {result['geometry']['location']}")
+            if result['place_id'] in cta_to_gmaps_ID_mapping:
+                '''print(f"Train Station {i + 1}:")
+                print(f"  Name: {result['name']}")
+                print(f"  Place ID: {result['place_id']}")
+                print(f"  Station ID: {cta_to_gmaps_ID_mapping[result['place_id']]}")'''
+                nearest_stations.append((result['name'], result['place_id'], cta_to_gmaps_ID_mapping[result['place_id']]))
+            else:
+                continue
+
+        return nearest_stations
     else:
         print("No train stations found.")
 
@@ -107,7 +119,7 @@ def get_place_id(address, api_key, type="Train Station"):
     '''old_address = address
     address = f'{address} {type}'
     print(address)'''
-    location = get_lat_lng_from_address("19 N. Dearborn St., Chicago, IL 60602", api_key)
+    location = get_lat_lng_from_address(address, api_key)
     if location is None:
         '''if type == "Train Station":
             return get_place_id(old_address, api_key, "Subway Station")
@@ -179,6 +191,19 @@ def get_departure_times(train_line, api_key):
             print(f"  Arrival Time: {eta['arrT']}")
     else:
         print("No departure times found.")
+
+def get_fastest_common_train_station(origin, destination, api_key):
+    origin_stations = get_nearest_trains_in_radius(100, origin, api_key)
+    destination_stations = get_nearest_trains_in_radius(100, destination, api_key)
+    print(origin_stations)
+    print(destination_stations)
+    for origin_station in origin_stations:
+        for destination_station in destination_stations:
+            if origin_station == destination_station:
+                return origin_station
+    return None
+
+get_fastest_common_train_station("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
 def map_station_cta2googlemaps(excel_path, api_key):
     df = pd.read_excel(excel_path)
