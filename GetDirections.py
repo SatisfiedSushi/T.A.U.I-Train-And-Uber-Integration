@@ -3,9 +3,10 @@ from datetime import datetime
 import polyline
 import requests
 
+api_key = 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM'
+
 gmaps = googlemaps.Client(key=api_key)
 
-import googlemaps
 
 def map_inputs(lat, long):
     # Generate markers for location
