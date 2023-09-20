@@ -19,19 +19,17 @@ def index():
     return render_template('input.html', start='', end='', api_key=api_key)
     """
 
-app = Flask(__name__)
 
-@app.route('/receive_location_data', methods=['POST'])
+@app.route('/')
 def receive_location_data():
-    data = request.get_json()
-    if data and 'latitude' in data and 'longitude' in data:
-        latitude = data['latitude']
-        longitude = data['longitude']
-        # Process the received location data (e.g., store it in a database)
-        print(f"Received location data - Latitude: {latitude}, Longitude: {longitude}")
-        return render_template('input.html'), jsonify({'message': 'Location data received successfully'}), 200
-    else:
-        return render_template('input.html'), jsonify({'error': 'Invalid location data'}), 400
+    """if request.method == 'POST':
+        latitude = request.form['latitude']
+        longitude = request.form['longitude']
+        accuracy = request.form['accuracy']
+        print(f"latitude: {latitude}, longitude: {longitude}")
+        print(f"accuracy : {accuracy}")
+        return render_template('location.html')"""
+    return render_template('location.html')
 
 
 if __name__ == '__main__':

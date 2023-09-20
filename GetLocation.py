@@ -33,6 +33,7 @@ import json
 
 api_key = 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM'
 
+
 def get_current_location(api_key):
     # Define the request payload
     payload = {
@@ -48,8 +49,10 @@ def get_current_location(api_key):
         location = data.get('location')
         accuracy = data.get('accuracy')
         print(f"Latitude: {location['lat']}, Longitude: {location['lng']}, Accuracy: {accuracy} meters")
+        return location, accuracy
     else:
         print(f"Failed to fetch location. Status code: {response.status_code}")
+
 
 current_location = get_current_location(api_key)
 print(current_location)

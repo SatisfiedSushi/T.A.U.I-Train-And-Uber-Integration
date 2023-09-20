@@ -16,19 +16,6 @@ cta_to_gmaps_ID_mapping = dict(zip(station_names, cta_station_IDs))
 
 # gmaps = googlemaps.Client(key='AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
 
-# uses google maps geolocation api to get a users location in lat and lng
-def get_user_location(api_key):
-    geolocation_api = f"https://www.googleapis.com/geolocation/v1/geolocate?key={api_key}"
-    response = requests.post(geolocation_api)
-    data = response.json()
-    if 'location' in data:
-        return data['location']
-    else:
-        return None
-
-print(get_user_location('AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM'))
-
-
 def find_closest_matching_string_with_fuzzywuzzy(string, list_of_strings):
     highest_score = 0
     closest_match = None
@@ -40,6 +27,7 @@ def find_closest_matching_string_with_fuzzywuzzy(string, list_of_strings):
     return closest_match, highest_score
 
 # print(f'Closest string: {find_closest_matching_string_with_fuzzywuzzy("Jackson & Austin Terminal, Northeastbound, Bus Terminal", cta_to_gmaps_ID_mapping.keys())}')
+
 
 '''
 #define locations
@@ -69,6 +57,8 @@ except:
         return None
 
 print(compute_routes_matrix("4419 N Lamon Ave, Chicago, IL 60630", "Jefferson Park Blue Line Station, Chicago, IL", "transit"))'''
+
+
 def convert_miles_to_meters(miles):
     return miles * 1609.34
 
