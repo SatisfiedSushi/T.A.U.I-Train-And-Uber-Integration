@@ -77,6 +77,10 @@
            var startInput = document.getElementById('start-input');
            var endInput = document.getElementById('end-input');
 
+            var startAutocomplete = new google.maps.places.Autocomplete(startInput);
+            var endAutocomplete = new google.maps.places.Autocomplete(endInput);
+            }
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
 
            var startAutocomplete = new google.maps.places.Autocomplete(startInput);
            var endAutocomplete = new google.maps.places.Autocomplete(endInput);
@@ -85,8 +89,7 @@
 
         function getUserLocation() {
             if ("geolocation" in navigator) {
-
-                navigator.geolocation.getCurrentPosition(function(position) {
+                navigator.geolocation.getCurrentPosition(function (position) {
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
                     var accuracy = position.coords.accuracy; // Accuracy in meters
@@ -98,10 +101,21 @@
                         accuracy: accuracy
                     };
 
-                    // Add code to send json data
-                    //add it
+                    // Convert locationData to a query string
+                    var queryString = Object.keys(locationData).map(function (key) {
+                        return key + '=' + encodeURIComponent(locationData[key]);
+                    }).join('&');
 
-                }, function(error) {
+                    // Send the JavaScript variable to the Flask server using a GET request
+                    fetch('/receive_location_data?' + queryString)
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById("start-input").value = data; // Update the HTML content with the received data
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }, function (error) {
                     if (error.code === error.PERMISSION_DENIED) {
                         alert("Location access denied. To enable, go to your browser settings.");
                     } else if (error.code === error.POSITION_UNAVAILABLE) {
@@ -173,7 +187,6 @@
    {% endif %}
    <script>
        const iframes = document.querySelectorAll('.carousel-iframe');
-       let currentFrame = 0;
 
 
        function showFrame(frameIndex) {
