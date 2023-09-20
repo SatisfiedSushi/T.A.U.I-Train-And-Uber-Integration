@@ -19,8 +19,9 @@ Taui aims to provide a seamless experience for users who wish to use both Uber a
 2. Input your starting location and destination
 3. Click the "Get Route" button
 4. Click the "Book Uber" button to book your Uber to the nearest train station
-5. Click the "Book Uber" button to book your Uber from the destination train station to your final destination
-6. Enjoy your ride!
+5. Click the arrow button to move on to the next map and see your train route
+6. Click the arrow button again to move on to the final map and see your Uber route from the destination train station to your final destination
+7. Enjoy your ride!
 
 ### Common Errors
 
@@ -32,14 +33,14 @@ To fix this, try entering a more specific location, or try entering the address 
 
 ---
 * Angelo L. [GitHub](https://github.com/SatisfiedSushi)  
-A liitle about me:
+Junior at Northside College Prep, I am the lead programmer of the robotics team and I enjoy kayaking and playing guitar in my free time.
 * Aditya G. [GitHub](https://github.com/agaur12)  
 Junior at Northside College Prep, I am the PR Director of the robotics team and I enjoy playing soccer.
 * Alex D. [GitHub](https://github.com/AlexD2112)  
-Junior at Northside College Prep,I program for my robotics team. In my free time, I play guitar and go biking. 
+Junior at Northside College Prep,I program for the robotics team. In my free time, I play guitar and go biking. 
 * Michael M. [GitHub](https://github.com/ThatOneGuy631)  
 Senior at Northside college prep, I am the captain of the robotics team
-and I enjoy playing saxophone and the bass guitar.
+and I enjoy playing saxophone and the bass guitar in my free time.
 
 ## License
 This program is free software: you can redistribute it and/or modify
