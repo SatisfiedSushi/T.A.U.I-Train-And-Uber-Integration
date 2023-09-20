@@ -1,3 +1,6 @@
+# defunct, kept for reference
+# initial attempt at a backend, read at your own risk
+
 import pandas as pd
 import pprint
 
