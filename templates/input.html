@@ -22,7 +22,7 @@
            flex-direction: column;
            align-items: center;
            justify-content: center;
-           height: 46vh;
+           height: 41vh;
            position: relative;
        }
        .carousel-navigation {
@@ -40,7 +40,7 @@
            padding: 0 0;
            cursor: pointer;
            box-sizing: border-box;
-           height: 46vh;
+           height: 41vh;
            width: 4vw;
        }
        .input-box, .click-button {
@@ -67,7 +67,7 @@
        }
        iframe {
            width: 100%;
-           height: 46vh;
+           height: 41vh;
            box-sizing: border-box;
        }
    </style>
@@ -99,7 +99,7 @@
                     };
 
                     // Add code to send json data
-                    add it
+                    //add it
 
                 }, function(error) {
                     if (error.code === error.PERMISSION_DENIED) {
@@ -120,17 +120,17 @@
 </head>
 <body>
    <h1 id = title>TAUI</h1>
-    <button onclick="getUserLocation()">Get Location</button>
+    <button class="click-button" onclick="getUserLocation()">Get My Current Location</button>
    <form method="POST">
        <label for="start-input">Start Address:</label>
        <br>
-       <input id="start-input" type="text" name="start" class="input-box">
+       <input id="start-input" type="text" name="start" class="input-box" value ="{{ start }}">
        <br>
        <label for="end-input">End Address:</label>
        <br>
-       <input id="end-input" type="text" name="end" class="input-box">
+       <input id="end-input" type="text" name="end" class="input-box" value = "{{ end }}">
        <br>
-       <input class = “click-button”, id = "directions-button" type="submit" value="Get Directions">
+       <input class = "click-button", id = "directions-button" type="submit" value="Get Directions">
    </form>
    {% if start and end %}
        <h1>Directions from {{ start }} to {{ end }}</h1>
