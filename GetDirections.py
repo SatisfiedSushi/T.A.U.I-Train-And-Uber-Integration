@@ -102,6 +102,10 @@ def get_transit_directions(start, end):
         departure_time=datetime.now(),
         transit_mode="bus|rail",  # Specify transit modes (e.g., bus and subway)
     )
+
+    if not transit_directions:
+        return "Error fetching transit directions"
+
     return transit_directions
 
 def get_driving_directions(start, end):
@@ -166,7 +170,10 @@ def combine_directions(transit_directions, driving_directions, end_point):
             mode="driving",
             departure_time=datetime.now(),
         )
-        combined_directions = driving_directions + final_driving_directions
+        if final_driving_directions:
+            combined_directions = driving_directions + final_driving_directions
+        else:
+            return "Error fetching final driving directions"
     else:
         combined_directions = driving_directions
 
@@ -265,7 +272,9 @@ def get_transit_stops(transit_steps):
     '''
     transit_stops = []
     for step in transit_steps:
-        if step['travel_mode'] == 'TRANSIT':
+        # travel_mode in step check handles an error where the steps are messed up if
+        # GMaps can't find a good route and throws an error in get_transit_stops
+        if 'travel_mode' in step and step['travel_mode'] == 'TRANSIT':
             transit_stops.append(step.get('transit_details', {}).get('arrival_stop', {}).get('name'))
     return transit_stops
 
@@ -285,6 +294,11 @@ def extract_transit_steps(directions):
         a list of transit steps from the given directions.
     
     '''
+
+    #checks if the directions are in a format that means theres an error- usually happens if you're trying to map to a location and GMaps cannot find a path
+    if isinstance(directions, str):
+        return [{"error_message": directions}]  # Return an error message in a list
+
     transit_steps = []
 
     for step in directions[0]['legs'][0]['steps']:
@@ -314,6 +328,10 @@ def get_chosen_route_data(start, end):
     '''
     transit_directions = get_transit_directions(start, end)
     driving_directions = get_driving_directions(start, end)
+
+    # Check if transit_directions is a string (error message), usually happens when GMaps fails to route
+    if isinstance(transit_directions, str):
+        return {"error_message": transit_directions}
 
     transit_time = calculate_total_time(transit_directions)
     driving_time = calculate_total_time(driving_directions)
