@@ -12,7 +12,7 @@
         }
         #click-box, .input-box {
             width: 100%;
-            box-sizing: border-box;
+            box-sizing: border-box
         }
         input[type="text"], #click-box{
             padding: 0.125vh; /* Adjust the padding for your desired size */
@@ -59,13 +59,11 @@
                 navigator.geolocation.getCurrentPosition(function (position) {
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
-                    var accuracy = position.coords.accuracy; // Accuracy in meters
 
                     // Create a JSON object with the input data
                     var locationData = {
                         latitude: latitude,
-                        longitude: longitude,
-                        accuracy: accuracy
+                        longitude: longitude
                     };
 
                     // Convert locationData to a query string
@@ -111,7 +109,7 @@
         <br>
         <input id="end-input" type="text" name="end" class="input-box" value="{{ end }}">
         <br>
-        <input id = "click-box" type="submit" value="Get Directions">
+        <input id ="click-box" type="submit" value="Get Directions">
     </form>
     {% if start and end %}
         <h1>Directions from {{ start }} to {{ end }}</h1>
@@ -120,9 +118,7 @@
             style="border:0"
             loading="lazy"
             allowfullscreen
-            src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
-            &origin={{ start }}
-            &destination={{ end }}">
+            src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}&origin={{ start }}&destination={{ end }}">
         </iframe>
     {% endif %}
 </body>
