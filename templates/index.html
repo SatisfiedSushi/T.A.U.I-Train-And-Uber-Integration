@@ -208,9 +208,11 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
         <div class="button-container">
             <div id="double-deeplink-button">
                <button class="half-click-button" id="double-uber-button">Call an Uber</button>
-               <button class="half-click-button" id="double-google-button">Call an Uber</button>
+               <button class="half-click-button" id="double-google-button">Open in Google</button>
             </div>
-            <button class="click-button" id="deeplink-button">Call an Uber</button>
+            <button class="click-button" id="deeplink-button" onclick =
+                    "window.open(uberUrls[currentIframeIndex], '_blank')"
+            >Open in Google</button>
        </div>
     {% endif %}
     <script>
@@ -241,11 +243,11 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
 
 
        const uberUrls = [
-           "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ stop1_lat }}&dropoff[longitude]={{ stop1_long }}&dropoff[formatted_address]={{ stop1_address }}",
            "https://www.google.com/maps/dir/?api=1" +
            "&origin={{stop1_lat}},{{ stop1_long }}" +
            "&destination={{ stop2_lat }},{{ stop2_long }}" +
            "&travelmode=transit",
+           "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ stop1_lat }}&dropoff[longitude]={{ stop1_long }}&dropoff[formatted_address]={{ stop1_address }}",
            "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ stop2_lat }}&pickup[longitude]={{ stop2_long }}&pickup[formatted_address]={{ stop2_address }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}",
            "https://www.google.com/maps/dir/?api=1" +
            "&origin={{start_lat}},{{ start_long }}" +
@@ -257,39 +259,42 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
            "&travelmode=transit",
        ];
 
+       function initializeUberDeeplink() {
+           const uberButton = document.getElementById(`deeplink-button`);
+           uberButton.onclick = function() {
+               window.open(uberUrls[0], '_blank')
+           }
+       }
 
-       function updateUberButtonLink() {
+       function updateButtonLinks() {
            const currentIframeIndex = currentFrame;
-           const currentUberButton = document.getElementById(`deeplink-button`);
            const routeLabel = document.getElementById('route-label')
            const halfUberButton = document.getElementById('double-uber-button')
            const halfGoogleButton = document.getElementById('double-google-button')
 
-           if (currentUberButton) {
-               currentUberButton.onclick = function() {
-                   window.open(uberUrls[currentIframeIndex], '_blank')
-               };
+           if (currentIframeIndex === 0) {
                halfUberButton.onclick = function() {
-                   window.open(uberUrls[currentIframeIndex], '_blank')
+                   window.open(uberUrls[3], '_blank')
                };
                halfGoogleButton.onclick = function() {
-                   window.open(uberUrls[currentIframeIndex], '_blank')
-               };
-           }
-           if (currentIframeIndex === 0) {
-               currentUberButton.innerHTML = "Call an Uber";
+                   window.open(uberUrls[1], '_blank')
+               }
                routeLabel.innerHTML = "Uber Ride 1"
            } else if (currentIframeIndex === 1) {
-               currentUberButton.innerHTML = "Open in Google";
                routeLabel.innerHTML = "Public Transit"
            } else {
-               currentUberButton.innerHTML = "Call an Uber";
+               halfUberButton.onclick = function() {
+                   window.open(uberUrls[4], '_blank')
+               };
+               halfGoogleButton.onclick = function() {
+                   window.open(uberUrls[2], '_blank')
+               }
                routeLabel.innerHTML = "Uber Ride 2"
            }
        }
 
-
-       updateUberButtonLink();
+       updateButtonLinks();
+       initializeUberDeeplink();
 
        function updateButtonVisibility() {
             const buttonContainer = document.querySelector('.button-container');
@@ -316,14 +321,14 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
 
        document.getElementById('next-button').addEventListener('click', function() {
            nextFrame();
-           updateUberButtonLink();
+           updateButtonLinks();
            updateButtonVisibility()
        });
 
 
        document.getElementById('prev-button').addEventListener('click', function() {
            prevFrame();
-           updateUberButtonLink();
+           updateButtonLinks();
            updateButtonVisibility()
        });
    </script>
