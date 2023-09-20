@@ -1,10 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>TEST</title>
+    <title>Send and Receive Data with Flask</title>
 </head>
 <body>
-    <h1>Send Variable to JS</h1>
-    <p>{{ name1 }} and {{ name2 }} went to the park without {{ name3 }}.</p>
+    <h1>Send and Receive Data with Flask</h1>
+
+    <script>
+        // Create a JavaScript variable
+        var jsVariable = "JAke";
+
+        // Send the JavaScript variable to the Flask server using a GET request
+        fetch('/receive_js_variable?value=' + encodeURIComponent(jsVariable))
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("received-data").textContent = data; // Update the HTML content with the received data
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    </script>
+
+    <p>Received data from Flask: <span id="received-data"></span></p>
 </body>
 </html>
+
