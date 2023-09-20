@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>TAUI</title>
     <style>
@@ -53,10 +53,45 @@
             var endAutocomplete = new google.maps.places.Autocomplete(endInput);
         }
         google.maps.event.addDomListener(window, 'load', initAutocomplete);
+
+        function getUserLocation() {
+            if ("geolocation" in navigator) {
+
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    var accuracy = position.coords.accuracy; // Accuracy in meters
+
+                    // Create a JSON object with the input data
+                    var locationData = {
+                        latitude: latitude,
+                        longitude: longitude,
+                        accuracy: accuracy
+                    };
+
+                    // Add code to send json data
+                    add it
+
+                }, function(error) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        alert("Location access denied. To enable, go to your browser settings.");
+                    } else if (error.code === error.POSITION_UNAVAILABLE) {
+                        alert("Location information is unavailable.");
+                    } else if (error.code === error.TIMEOUT) {
+                        alert("The request to get user location timed out.");
+                    } else {
+                        alert("An unknown error occurred.");
+                    }
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
     </script>
 </head>
 <body>
     <h1 id = title>TAUI</h1>
+    <button onclick="getUserLocation()">Get Location</button>
     <form method="POST">
         <label for="start-input">Start Address:</label>
         <br>
