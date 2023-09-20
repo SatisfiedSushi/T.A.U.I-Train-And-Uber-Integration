@@ -16,6 +16,8 @@
        }
        .carousel-iframe {
            width: 90vw;
+           z-index: 100;
+           position: relative;
        }
        .carousel-container {
            display: flex;
@@ -127,20 +129,20 @@
 </head>
 <body>
     <h1 id = title>TAUI</h1>
-    <button class = click-box onclick="getUserLocation()">Get Current Location</button>
+    <button class = click-button onclick="getUserLocation()">Get Current Location</button>
     <form method="POST">
         <label for="start-input">Start Address:</label>
         <br>
-        <input id="start-input" type="text" name="start" class="input-box" value={{ start }}>
+        <input id="start-input" type="text" name="start" class="input-box" value="{{ start }}">
         <br>
         <label for="end-input">End Address:</label>
         <br>
         <input id="end-input" type="text" name="end" class="input-box" value="{{ end }}">
         <br>
-        <input class ="click-box" type="submit" value="Get Directions">
+        <input class ="click-button" type="submit" value="Get Directions">
     </form>
     {% if start and end %}
-       <h1>Directions from {{ start }} to {{ end }}</h1>
+       <h1 id = "route-label"></h1>
        <div class="carousel-container">
            <div id="iframe-carousel">
                <iframe
@@ -183,7 +185,7 @@
     {% endif %}
     <script>
        const iframes = document.querySelectorAll('.carousel-iframe');
-
+       let currentFrame = 0;
 
        function showFrame(frameIndex) {
            iframes.forEach((iframe, index) => {
@@ -211,8 +213,8 @@
        const uberUrls = [
            "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ stop1_lat }}&dropoff[longitude]={{ stop1_long }}&dropoff[formatted_address]={{ stop1_address }}",
            "https://www.google.com/maps/dir/?api=1" +
-           "&origin={{stop1_address}}" +
-           "&destination={{ stop2_address }}" +
+           "&origin={{stop1_lat}},{{ stop1_long }}" +
+           "&destination={{ stop2_lat }},{{ stop2_long }}" +
            "&travelmode=transit",
            "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ stop2_lat }}&pickup[longitude]={{ stop2_long }}&pickup[formatted_address]={{ stop2_address }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}",
        ];
@@ -221,10 +223,22 @@
        function updateUberButtonLink() {
            const currentIframeIndex = currentFrame;
            const currentUberButton = document.getElementById(`deeplink-button`);
-
+           const routeLabel = document.getElementById('route-label')
 
            if (currentUberButton) {
-               currentUberButton.href = uberUrls[currentIframeIndex];
+               currentUberButton.onclick = function() {
+                   window.open(uberUrls[currentIframeIndex], '_blank')
+               };
+           }
+           if (currentIframeIndex === 0) {
+               currentUberButton.innerHTML = "Call an Uber";
+               routeLabel.innerHTML = "Uber Ride 1"
+           } else if (currentIframeIndex === 1) {
+               currentUberButton.innerHTML = "Open in Google";
+               routeLabel.innerHTML = "Public Transit"
+           } else {
+               currentUberButton.innerHTML = "Call an Uber";
+               routeLabel.innerHTML = "Uber Ride 2"
            }
        }
 

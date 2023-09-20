@@ -182,7 +182,7 @@
    {% endif %}
    <script>
        const iframes = document.querySelectorAll('.carousel-iframe');
-
+       let currentFrame = 0;
 
        function showFrame(frameIndex) {
            iframes.forEach((iframe, index) => {
