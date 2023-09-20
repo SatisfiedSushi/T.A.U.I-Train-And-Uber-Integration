@@ -31,10 +31,24 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
            height: 41vh;
            position: relative;
        }
+       .button-container {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           position: relative;
+       }
        .carousel-navigation {
            position:absolute;
            top: 50%;
            transform: translateY(-50%);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           width: 100%;
+       }
+       #double-deeplink-button {
+           bottom: 0;
            display: flex;
            justify-content: space-between;
            align-items: center;
@@ -233,6 +247,14 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
            "&destination={{ stop2_lat }},{{ stop2_long }}" +
            "&travelmode=transit",
            "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ stop2_lat }}&pickup[longitude]={{ stop2_long }}&pickup[formatted_address]={{ stop2_address }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}",
+           "https://www.google.com/maps/dir/?api=1" +
+           "&origin={{start_lat}},{{ start_long }}" +
+           "&destination={{stop1_lat}},{{ stop1_long }}" +
+           "&travelmode=transit",
+           "https://www.google.com/maps/dir/?api=1" +
+           "&origin={{stop2_lat}},{{ stop2_long }}" +
+           "&destination={{ end_lat }},{{ end_long }}" +
+           "&travelmode=transit",
        ];
 
 
@@ -240,9 +262,17 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
            const currentIframeIndex = currentFrame;
            const currentUberButton = document.getElementById(`deeplink-button`);
            const routeLabel = document.getElementById('route-label')
+           const halfUberButton = document.getElementById('double-uber-button')
+           const halfGoogleButton = document.getElementById('double-google-button')
 
            if (currentUberButton) {
                currentUberButton.onclick = function() {
+                   window.open(uberUrls[currentIframeIndex], '_blank')
+               };
+               halfUberButton.onclick = function() {
+                   window.open(uberUrls[currentIframeIndex], '_blank')
+               };
+               halfGoogleButton.onclick = function() {
                    window.open(uberUrls[currentIframeIndex], '_blank')
                };
            }
@@ -261,16 +291,40 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
 
        updateUberButtonLink();
 
+       function updateButtonVisibility() {
+            const buttonContainer = document.querySelector('.button-container');
+            const doubleUberButton = document.getElementById('double-uber-button');
+            const doubleGoogleButton = document.getElementById('double-google-button');
+            const singleUberButton = document.getElementById('deeplink-button');
+
+            if (buttonContainer && doubleUberButton && doubleGoogleButton && singleUberButton) {
+                if (currentFrame === 1) {
+                    buttonContainer.style.display = 'block'; // Show the button container on frame 1
+                    doubleUberButton.style.display = 'none'; // Hide the double "Call an Uber" button on frame 1
+                    doubleGoogleButton.style.display = 'none'; // Hide the double "Open in Google" button on frame 1
+                    singleUberButton.style.display = 'block'; // Show the single "Call an Uber" button on frame 1
+                } else {
+                    singleUberButton.style.display = 'none'; // Hide the single "Call an Uber" button on frames 0 and 2
+                    doubleUberButton.style.display = 'block' //Show the double "Call an Uber" button on frames 0 and 2
+                    doubleGoogleButton.style.display = 'block' //Show the double "Open in Google" button on frames 0 and 2
+                }
+            }
+       }
+
+       // Call updateButtonVisibility initially
+       updateButtonVisibility();
 
        document.getElementById('next-button').addEventListener('click', function() {
            nextFrame();
            updateUberButtonLink();
+           updateButtonVisibility()
        });
 
 
        document.getElementById('prev-button').addEventListener('click', function() {
            prevFrame();
            updateUberButtonLink();
+           updateButtonVisibility()
        });
    </script>
 </body>
