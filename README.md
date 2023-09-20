@@ -15,25 +15,40 @@ Taui aims to provide a seamless experience for users who wish to use both Uber a
 ### How to use T.A.U.I
 
 ---
-1. Go to http://taui.pythonanywhere.com/
+1. Go to https://taui.pythonanywhere.com/
 2. Input your starting location and destination
 3. Click the "Get Route" button
 4. Click the "Book Uber" button to book your Uber to the nearest train station
-5. Click the "Book Uber" button to book your Uber from the destination train station to your final destination
-6. Enjoy your ride!
+5. Click the arrow button to move on to the next map and see your train route
+6. Click the arrow button again to move on to the final map and see your Uber route from the destination train station to your final destination
+7. Enjoy your ride!
 
-### How It Works
+### Common Errors
 
 ---
-
+* Sometimes when you input the name of a location, the map will not display the location. 
+This is because the Google Maps API does not recognize the location you entered. 
+To fix this, try entering a more specific location, or try entering the address of the location.
 ### Contributors
 
 ---
 * Angelo L. [GitHub](https://github.com/SatisfiedSushi)  
-A liitle about me:
+Junior at Northside College Prep, I am the lead programmer of the robotics team and I enjoy kayaking and playing guitar in my free time.
 * Aditya G. [GitHub](https://github.com/agaur12)  
-a little about me:
-* Alexander D. [GitHub](https://github.com/AlexD2112)  
-a little about me:
+Junior at Northside College Prep, I am the PR Director of the robotics team and I enjoy playing soccer.
+* Alex D. [GitHub](https://github.com/AlexD2112)  
+Junior at Northside College Prep,I program for the robotics team. In my free time, I play guitar and go biking. 
 * Michael M. [GitHub](https://github.com/ThatOneGuy631)  
-a little about me:
+Senior at Northside college prep, I am the captain of the robotics team
+and I enjoy playing saxophone and the bass guitar in my free time.
+
+## License
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.

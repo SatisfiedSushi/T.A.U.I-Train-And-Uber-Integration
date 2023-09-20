@@ -8,36 +8,36 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    '''The `index()` function retrieves route data based on user input, extracts relevant information from
+    the data, and renders an HTML template with the extracted information.
+    
+    Returns
+    -------
+        The function `index()` returns a rendered template called 'index.html' with various variables
+    passed to it. The variables include `start`, `end`, `api_key`, `start_lat`, `start_long`, `end_lat`,
+    `end_long`, `stop1_lat`, `stop1_long`, `stop1_address`, `stop2_lat`, `stop2_long`, and
+    `stop2_address
+    
+    '''
     if request.method == 'POST':
         start = request.form['start']
         end = request.form['end']
         # Get the route data
         route_data = get_chosen_route_data(start, end)
-        # Extract individual parts into variables
-        mode = route_data["mode"]
-        distance = route_data["distance"]
-        time = route_data["time"]
-        departure_time = route_data["departure_time"]
-        arrival_time = route_data["arrival_time"]
 
         # Get path of route
         directions = route_data["directions"]
-        path = extract_polyline(directions)
 
         # Get locations and markers for each location
         stop_lat = []
         stop_long = []
-        markers = []
         for stop in route_data["transit_stops"]:
             stop_lat.append(stop['location']['lat'])
             stop_long.append(stop['location']['lng'])
-            markers.append(map_inputs(stop['location']['lat'], stop['location']['lng']))
         start_location = directions[0]['legs'][0]['start_location']
         end_location = directions[0]['legs'][0]['end_location']
         end_lat, end_long = end_location['lat'], end_location['lng']
         start_lat, start_long = start_location['lat'], start_location['lng']
-        markers.append(map_inputs(start_lat, start_long))
-        markers.append(map_inputs(end_lat,end_long))
 
         # Get first and last station lat and long
         stop1_lat = stop_lat[0]
@@ -46,15 +46,23 @@ def index():
         stop2_lat = stop_lat[-1]
         stop2_long = stop_long[-1]
         stop2_address = get_address_from_lat_lng(stop2_lat, stop2_long, api_key)
-        return render_template('index.html', start=start, end=end, api_key=api_key, markers=markers, mode=mode,
-                               distance=distance, time=time, departure_time=departure_time, arrival_time=arrival_time,
+        return render_template('index.html', start=start, end=end, api_key=api_key,
                                start_lat=start_lat, start_long=start_long, end_lat=end_lat, end_long=end_long,
-                               stop1_lat=stop1_lat, stop1_long=stop1_long, stop1_address=stop1_address, stop2_lat=stop2_lat, stop2_long=stop2_long, stop2_address=stop2_address, path=path)
+                               stop1_lat=stop1_lat, stop1_long=stop1_long, stop1_address=stop1_address,
+                               stop2_lat=stop2_lat, stop2_long=stop2_long, stop2_address=stop2_address)
     return render_template('index.html', start='', end='', api_key=api_key)
 
 
 @app.route('/receive_location_data', methods=['GET'])
 def receive_location_data():
+    '''The function receives latitude and longitude data, uses an API key to get the corresponding address,
+    and returns the address.
+    
+    Returns
+    -------
+        The address of the location corresponding to the latitude and longitude provided.
+    
+    '''
     lat = request.args.get('latitude')
     long = request.args.get('longitude')
     address = get_address_from_lat_lng(lat, long, api_key)
