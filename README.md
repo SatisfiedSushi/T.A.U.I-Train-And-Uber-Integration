@@ -28,7 +28,8 @@ Taui aims to provide a seamless experience for users who wish to use both Uber a
 ---
 * Sometimes when you input the name of a location, the map will not display the location. 
 This is because the Google Maps API does not recognize the location you entered. 
-To fix this, try entering a more specific location, or try entering the address of the location.
+To fix this, try entering a more specific location, or try entering the address of the location. 
+Crosstreets do not work. 
 ### Contributors
 
 ---
