@@ -29,6 +29,11 @@ Taui aims to provide a seamless experience for users who wish to use both Uber a
 * Sometimes when you input the name of a location, the map will not display the location. 
 This is because the Google Maps API does not recognize the location you entered. 
 To fix this, try entering a more specific location, or try entering the address of the location.
+* If you haven't enabled location tracking for the website in your settings, the Get Location button will not work as it uses location data.
+While sometimes the returned location may be off due to a slight margin of error when geocaching a position. 
+To counteract this error you can enter the address of your current location.
+* Sometimes the code will send you to a station and make you go from that station to the same station because that is the closest station to your location that will take you near the desired location. 
+When experiencing this error only reference the first map which shows an uber, titled "Uber 1". Also, when entering using the uber deeplink you should edit your destination to be your desired final destination instead of teh station.
 ### Contributors
 
 ---
