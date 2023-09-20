@@ -10,17 +10,17 @@
         html, label {
             background-color: #1F2833;
         }
-        #click-box, .input-box {
+        .click-box, .input-box {
             width: 100%;
             box-sizing: border-box
         }
-        input[type="text"], #click-box{
+        input[type="text"], .click-box{
             padding: 0.125vh; /* Adjust the padding for your desired size */
             border: 0.75vh solid #AADAFF;
             border-radius: 0.75vh;
             background-color: #1F2833;
         }
-        input, #click-box {
+        input, .click-box {
             color: #AADAFF;
             font-size: 3.75vh;
             margin-bottom: 0.5vh;
@@ -99,7 +99,7 @@
 </head>
 <body>
     <h1 id = title>TAUI</h1>
-    <button onclick="getUserLocation()">Get Current Location</button>
+    <button class = click-box onclick="getUserLocation()">Get Current Location</button>
     <form method="POST">
         <label for="start-input">Start Address:</label>
         <br>
@@ -109,7 +109,7 @@
         <br>
         <input id="end-input" type="text" name="end" class="input-box" value="{{ end }}">
         <br>
-        <input id ="click-box" type="submit" value="Get Directions">
+        <input class ="click-box" type="submit" value="Get Directions">
     </form>
     {% if start and end %}
         <h1>Directions from {{ start }} to {{ end }}</h1>
