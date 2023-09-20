@@ -1,27 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Send and Receive Data with Flask</title>
+    <title>TAUI</title>
+    <style>
+        /* Style for the input boxes */
+        *{
+            font-family: "Lucida Console", "Arial", sans-serif;
+        }
+        html, label {
+            background-color: #1F2833;
+        }
+        #click-box, .input-box {
+            width: 100%;
+            box-sizing: border-box
+        }
+        input[type="text"], #click-box{
+            padding: 0.125vh; /* Adjust the padding for your desired size */
+            border: 0.75vh solid #AADAFF;
+            border-radius: 0.75vh;
+            background-color: #1F2833;
+        }
+        input, #click-box {
+            color: #AADAFF;
+            font-size: 3.75vh;
+            margin-bottom: 0.5vh;
+            margin-top: 0;
+        }
+        h1, label {
+            color: #AADAFF;
+            font-size: 2.5vh;
+            margin-bottom: 0.5vh;
+            margin-top: 0;
+        }
+        #title {
+            font-size: 12vh;
+            margin-top: 0;
+            margin-bottom: 2.5vh;
+        }
+        iframe {
+            width: 100%;
+            height: 50vh;
+            box-sizing: border-box;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
+    <script>
+        function initAutocomplete() {
+            var startInput = document.getElementById('start-input');
+            var endInput = document.getElementById('end-input');
+
+            var startAutocomplete = new google.maps.places.Autocomplete(startInput);
+            var endAutocomplete = new google.maps.places.Autocomplete(endInput);
+            }
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
+
+        function getUserLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+
+                    // Create a JSON object with the input data
+                    var locationData = {
+                        latitude: latitude,
+                        longitude: longitude
+                    };
+
+                    // Convert locationData to a query string
+                    var queryString = Object.keys(locationData).map(function (key) {
+                        return key + '=' + encodeURIComponent(locationData[key]);
+                    }).join('&');
+
+                    // Send the JavaScript variable to the Flask server using a GET request
+                    fetch('/receive_location_data?' + queryString)
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById("start-input").value = data; // Update the HTML content with the received data
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }, function (error) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        alert("Location access denied. To enable, go to your browser settings.");
+                    } else if (error.code === error.POSITION_UNAVAILABLE) {
+                        alert("Location information is unavailable.");
+                    } else if (error.code === error.TIMEOUT) {
+                        alert("The request to get user location timed out.");
+                    } else {
+                        alert("An unknown error occurred.");
+                    }
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
 </head>
 <body>
-    <h1>Send and Receive Data with Flask</h1>
-
-    <script>
-        // Create a JavaScript variable
-        var jsVariable = "JAke";
-
-        // Send the JavaScript variable to the Flask server using a GET request
-        fetch('/receive_js_variable?value=' + encodeURIComponent(jsVariable))
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById("received-data").textContent = data; // Update the HTML content with the received data
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    </script>
-
-    <p>Received data from Flask: <span id="received-data"></span></p>
+    <h1 id = title>TAUI</h1>
+    <button onclick="getUserLocation()">Get Current Location</button>
+    <form method="POST">
+        <label for="start-input">Start Address:</label>
+        <br>
+        <input id="start-input" type="text" name="start" class="input-box" value={{ start }}>
+        <br>
+        <label for="end-input">End Address:</label>
+        <br>
+        <input id="end-input" type="text" name="end" class="input-box" value="{{ end }}">
+        <br>
+        <input id ="click-box" type="submit" value="Get Directions">
+    </form>
+    {% if start and end %}
+        <h1>Directions from {{ start }} to {{ end }}</h1>
+        <a href="https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}">Call an Uber</a>
+        <iframe
+            style="border:0"
+            loading="lazy"
+            allowfullscreen
+            src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}&origin={{ start }}&destination={{ end }}">
+        </iframe>
+    {% endif %}
 </body>
 </html>
-
