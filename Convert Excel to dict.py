@@ -1,7 +1,7 @@
-import pandas as pd
 from pandas import *
+
 import pprint
-df = pd.read_excel('CTA train addresses.xlsx')
+df = read_excel('CTA train addresses.xlsx')
 google_maps_place_IDs = df['gmaps place id'].tolist()
 cta_station_IDs = df['cta station id'].tolist()
 

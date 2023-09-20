@@ -1,59 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Send Current Location</title>
+    <title>Get User Location</title>
 </head>
 <body>
-    <h1>Send Current Location</h1>
-    <p>Latitude: <span id="latitude"></span></p>
-    <p>Longitude: <span id="longitude"></span></p>
+    <h1>Get User Location</h1>
+    <button onclick="getUserLocation()">Get Location</button>
+    <p id="request-message" style="display: none;">We need your location for better service.</p>
 
     <script>
-        function updateLocation(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
+        function getUserLocation() {
+            if ("geolocation" in navigator) {
+                // Display the request message
+                document.getElementById("request-message").style.display = "block";
 
-            document.getElementById("latitude").textContent = latitude;
-            document.getElementById("longitude").textContent = longitude;
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    var accuracy = position.coords.accuracy; // Accuracy in meters
 
-            // Send location data to the server
-            sendLocationData(latitude, longitude);
-        }
+                    // Hide the request message
+                    document.getElementById("request-message").style.display = "none";
 
-        function handleLocationError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    console.error("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    console.error("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    console.error("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    console.error("An unknown error occurred.");
-                    break;
+                    alert("Latitude: " + latitude + "\nLongitude: " + longitude + "\nAccuracy: " + accuracy + " meters");
+                }, function(error) {
+                    // Hide the request message
+                    document.getElementById("request-message").style.display = "none";
+
+                    if (error.code === error.PERMISSION_DENIED) {
+                        alert("Location access denied. To enable, go to your browser settings.");
+                    } else if (error.code === error.POSITION_UNAVAILABLE) {
+                        alert("Location information is unavailable.");
+                    } else if (error.code === error.TIMEOUT) {
+                        alert("The request to get user location timed out.");
+                    } else {
+                        alert("An unknown error occurred.");
+                    }
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
             }
-        }
-
-        function sendLocationData(latitude, longitude) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/receive_location_data", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-            var data = {
-                latitude: latitude,
-                longitude: longitude
-            };
-
-            xhr.send(JSON.stringify(data));
-        }
-
-        if ("geolocation" in navigator) {
-            navigator.geolocation.watchPosition(updateLocation, handleLocationError);
-        } else {
-            console.error("Geolocation is not supported by this browser.");
         }
     </script>
 </body>
