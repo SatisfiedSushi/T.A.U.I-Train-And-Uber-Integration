@@ -1,58 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>TAUI</title>
-    <style>
-        /* Style for the input boxes */
-        *{
-            font-family: "Lucida Console", "Arial", sans-serif;
-        }
-        html, label {
-            background-color: #1F2833;
-        }
-        #click-box, .input-box {
-            width: 100%;
-            box-sizing: border-box;
-        }
-        input[type="text"], #click-box{
-            padding: 0.125vh; /* Adjust the padding for your desired size */
-            border: 0.75vh solid #AADAFF;
-            border-radius: 0.75vh;
-            background-color: #1F2833;
-        }
-        input, #click-box {
-            color: #AADAFF;
-            font-size: 3.75vh;
-            margin-bottom: 0.5vh;
-            margin-top: 0;
-        }
-        h1, label {
-            color: #AADAFF;
-            font-size: 2.5vh;
-            margin-bottom: 0.5vh;
-            margin-top: 0;
-        }
-        #title {
-            font-size: 12vh;
-            margin-top: 0;
-            margin-bottom: 2.5vh;
-        }
-        iframe {
-            width: 100%;
-            height: 50vh;
-            box-sizing: border-box;
-        }
-    </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
-    <script>
-        function initAutocomplete() {
-            var startInput = document.getElementById('start-input');
-            var endInput = document.getElementById('end-input');
+   <title>TAUI</title>
+   <style>
+       *{
+           font-family: "Lucida Console", "Arial", sans-serif;
+       }
+       html, label, .click-button, .carousel-button, .input-box{
+           background-color: #1F2833;
+           color: #AADAFF;
+       }
+       .click-button, .carousel-button, .input-box{
+           border: 0.75vh solid #AADAFF;
+           border-radius: 0.75vh;
+       }
+       .carousel-iframe {
+           width: 90vw;
+       }
+       .carousel-container {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           height: 46vh;
+           position: relative;
+       }
+       .carousel-navigation {
+           position:absolute;
+           top: 50%;
+           transform: translateY(-50%);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           width: 100%;
+       }
+       .carousel-button {
+           font-size: 2.5vh;
+           border-radius: 0.75vh;
+           padding: 0 0;
+           cursor: pointer;
+           box-sizing: border-box;
+           height: 46vh;
+           width: 4vw;
+       }
+       .input-box, .click-button {
+           width: 100%;
+           box-sizing: border-box;
+       }
+       input[type="text"], .click-button{
+           padding: 0.125vh;
+       }
+       input, .click-button, .input-box{
+           font-size: 3.75vh;
+           margin-bottom: 0.5vh;
+           margin-top: 0;
+       }
+       h1, label {
+           font-size: 2.5vh;
+           margin-bottom: 0.5vh;
+           margin-top: 0;
+       }
+       #title {
+           font-size: 12vh;
+           margin-top: 0;
+           margin-bottom: 2.5vh;
+       }
+       iframe {
+           width: 100%;
+           height: 46vh;
+           box-sizing: border-box;
+       }
+   </style>
+   <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
+   <script>
+       function initAutocomplete() {
+           var startInput = document.getElementById('start-input');
+           var endInput = document.getElementById('end-input');
 
-            var startAutocomplete = new google.maps.places.Autocomplete(startInput);
-            var endAutocomplete = new google.maps.places.Autocomplete(endInput);
-        }
-        google.maps.event.addDomListener(window, 'load', initAutocomplete);
+
+           var startAutocomplete = new google.maps.places.Autocomplete(startInput);
+           var endAutocomplete = new google.maps.places.Autocomplete(endInput);
+       }
+       google.maps.event.addDomListener(window, 'load', initAutocomplete);
 
         function getUserLocation() {
             if ("geolocation" in navigator) {
@@ -87,33 +116,121 @@
                 alert("Geolocation is not supported by this browser.");
             }
         }
-    </script>
+   </script>
 </head>
 <body>
-    <h1 id = title>TAUI</h1>
+   <h1 id = title>TAUI</h1>
     <button onclick="getUserLocation()">Get Location</button>
-    <form method="POST">
-        <label for="start-input">Start Address:</label>
-        <br>
-        <input id="start-input" type="text" name="start" class="input-box" value="{{ start }}">
-        <br>
-        <label for="end-input">End Address:</label>
-        <br>
-        <input id="end-input" type="text" name="end" class="input-box" value="{{ end }}">
-        <br>
-        <input id = "click-box" type="submit" value="Get Directions">
-    </form>
-    {% if start and end %}
-        <h1>Directions from {{ start }} to {{ end }}</h1>
-        <a href="https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}">Call an Uber</a>
-        <iframe
-            style="border:0"
-            loading="lazy"
-            allowfullscreen
-            src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
-            &origin={{ start }}
-            &destination={{ end }}">
-        </iframe>
-    {% endif %}
+   <form method="POST">
+       <label for="start-input">Start Address:</label>
+       <br>
+       <input id="start-input" type="text" name="start" class="input-box">
+       <br>
+       <label for="end-input">End Address:</label>
+       <br>
+       <input id="end-input" type="text" name="end" class="input-box">
+       <br>
+       <input class = “click-button”, id = "directions-button" type="submit" value="Get Directions">
+   </form>
+   {% if start and end %}
+       <h1>Directions from {{ start }} to {{ end }}</h1>
+       <div class="carousel-container">
+           <div id="iframe-carousel">
+               <iframe
+                   class="carousel-iframe"
+                   style="border:0"
+                   loading="lazy"
+                   allowfullscreen
+                   src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
+                   &origin={{ start }}
+                   &destination={{ end }}">
+               </iframe>
+               <iframe
+                   class="carousel-iframe"
+                   style="border:0"
+                   loading="lazy"
+                   allowfullscreen
+                   src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
+                   &origin={{ start }}
+                   &destination={{ end }}">
+               </iframe>
+               <iframe
+                   class="carousel-iframe"
+                   style="border:0"
+                   loading="lazy"
+                   allowfullscreen
+                   src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}
+                   &origin={{ start }}
+                   &destination={{ end }}">
+               </iframe>
+           </div>
+           <div class="carousel-navigation">
+               <button class="carousel-button" id="prev-button">&lt</button>
+               <button class="carousel-button" id="next-button">&gt</button>
+           </div>
+       </div>
+       <button class="click-button" id="deeplink-button">Call an Uber</button>
+   {% endif %}
+   <script>
+       const iframes = document.querySelectorAll('.carousel-iframe');
+       let currentFrame = 0;
+
+
+       function showFrame(frameIndex) {
+           iframes.forEach((iframe, index) => {
+               iframe.style.display = index === frameIndex ? 'block' : 'none';
+           });
+       }
+
+
+       function nextFrame() {
+           currentFrame = (currentFrame + 1) % iframes.length;
+           showFrame(currentFrame);
+       }
+
+
+       function prevFrame() {
+           currentFrame = (currentFrame - 1 + iframes.length) % iframes.length;
+           showFrame(currentFrame);
+       }
+
+
+       // Initially show the first iframe
+       showFrame(currentFrame);
+
+
+       const uberUrls = [
+           "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}",
+           "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}",
+           "https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}",
+       ];
+
+
+       function updateUberButtonLink() {
+           const currentIframeIndex = currentFrame;
+           const currentUberButton = document.getElementById(`deeplink-button`);
+
+
+           if (currentUberButton) {
+               currentUberButton.href = uberUrls[currentIframeIndex];
+           }
+       }
+
+
+       updateUberButtonLink();
+
+
+       document.getElementById('next-button').addEventListener('click', function() {
+           nextFrame();
+           updateUberButtonLink();
+       });
+
+
+       document.getElementById('prev-button').addEventListener('click', function() {
+           prevFrame();
+           updateUberButtonLink();
+       });
+   </script>
 </body>
 </html>
+
