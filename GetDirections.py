@@ -3,7 +3,7 @@ from datetime import datetime
 import polyline
 import requests
 
-gmaps = googlemaps.Client(key=api_key)
+gmaps = googlemaps.Client("AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
 import googlemaps
 
