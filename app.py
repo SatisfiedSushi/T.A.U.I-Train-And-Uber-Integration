@@ -65,13 +65,13 @@ def index():
 
 @app.route('/receive_location_data', methods=['GET'])
 def receive_location_data():
-    '''The function receives latitude and longitude data, uses an API key to get the corresponding address,
+    '''The function receives latitude and longitude data of the user, uses an API key to get the corresponding address,
     and returns the address.
 
     Returns
     -------
-        The address of the location corresponding to the latitude and longitude provided.
-
+        The address of the current location of the user corresponding to the latitude and longitude provided.
+    
     '''
     lat = request.args.get('latitude')
     long = request.args.get('longitude')
