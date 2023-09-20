@@ -9,7 +9,7 @@ api_key = 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM'
 app = Flask(__name__)
 
 
-@app.route('/' """, methods=['GET', 'POST']""")
+@app.route('/' , methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         start = request.form['start']
