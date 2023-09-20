@@ -148,27 +148,6 @@ def get_routes(origin, destination, api_key):
         print("No routes found.")
 
 # get_routes("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
-def get_address_from_lat_lng(latitude, longitude, api_key):
-    # Define the Google Maps Geocoding API endpoint
-    geocode_api = "https://maps.googleapis.com/maps/api/geocode/json"
-    # Prepare the parameters
-    params = {
-        "latlng": f"{latitude},{longitude}",
-        "key": api_key,  # Replace with your Google Maps API key
-    }
-    # Send a GET request to the Geocoding API
-    response = requests.get(geocode_api, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        if data["status"] == "OK" and len(data["results"]) > 0:
-            # Extract the formatted address from the first result
-            formatted_address = data["results"][0]["formatted_address"]
-            return formatted_address
-        else:
-            return "Address not found"
-    else:
-        return "Error fetching address"
-
 
 def get_address_from_name(name, api_key):
     gmaps_places_api = f"https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={name}&inputtype=textquery&fields=formatted_address&key={api_key}"
