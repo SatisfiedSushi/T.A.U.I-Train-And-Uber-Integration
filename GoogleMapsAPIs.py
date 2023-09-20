@@ -5,6 +5,8 @@ import requests
 import datetime
 from fuzzywuzzy import fuzz
 
+origin_stop = ""
+destination_stop = ""
 
 df = pd.read_excel('CTA train addresses.xlsx')
 station_names = df['station name'].tolist()
@@ -12,9 +14,19 @@ cta_station_IDs = df['cta station id'].tolist()
 
 # convert to dict
 cta_to_gmaps_ID_mapping = dict(zip(station_names, cta_station_IDs))
+user_location_lat_lng = None
 # Gets directions from one location to another
 
 # gmaps = googlemaps.Client(key='AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
+
+def get_address_from_place_ID(place_id, api_key):
+    gmaps_places_api = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=formatted_address&key={api_key}"
+    response = requests.get(gmaps_places_api)
+    data = response.json()
+    if 'result' in data:
+        return data['result']['formatted_address']
+    else:
+        return None
 
 def find_closest_matching_string_with_fuzzywuzzy(string, list_of_strings):
     highest_score = 0
@@ -87,6 +99,13 @@ def get_common_run_number(origin_station_id, destination_station_id, direction, 
     origin_trains = get_cta_data_of_Station(origin_station_id, api_key) # list of trains
     destination_trains = get_cta_data_of_Station(destination_station_id, api_key) # list of trains
     common_trains = []
+    print(f'Origin station id: {origin_station_id}')
+    print(f'Destination station id: {destination_station_id}')
+    print(f'Origin trains: {origin_trains}')
+    print(f'Destination trains: {destination_trains}')
+    if origin_trains is None or destination_trains is None:
+        print("No common trains found.")
+        return
     for origin_train in origin_trains:
         for destination_train in destination_trains:
             if origin_train['Run Number'] == destination_train['Run Number']:
@@ -106,11 +125,11 @@ def get_common_run_number(origin_station_id, destination_station_id, direction, 
                 if arrival_time < fastest_time:
                     fastest_time = arrival_time
                     fastest_train = train
-        print(f"Fastest trai]n: {fastest_train}")
+        print(f"Fastest train: {fastest_train}")
         print(f"Fastest time: {fastest_time}")
         return fastest_train
 
-# get_common_run_number(40370, 41330, 'Southbound',  "4a8cc4d9702a4087af064b1fc18f00d9")
+# print(f'common run number{get_common_run_number(40370, 41330, "Southbound", "4a8cc4d9702a4087af064b1fc18f00d9")}')
 
 '''print(get_cta_data_of_Station(41330, "4a8cc4d9702a4087af064b1fc18f00d9"))
 print(get_cta_data_of_Station(40370, "4a8cc4d9702a4087af064b1fc18f00d9"))'''
@@ -141,26 +160,71 @@ def get_address_from_name(name, api_key):
 
 # get_address_from_name("Northside College Preparatory Highschool",'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM')
 
-def get_lat_lng_from_address(address, api_key):
+def get_place_id(address, api_key, type="Train Station"):
+    old_address = address
+    address = f'{address} {type}'
+    print(address)
+    location = get_lat_lng_from_address(address, api_key)
+    if location is None:
+        if type == "Train Station":
+            return get_place_id(old_address, api_key, "Subway Station")
+        if type == "Subway Station":
+            return get_place_id(old_address, api_key, "Station")
+        if type == "Station":
+            return get_place_id(old_address, api_key, "CTA Train Station")
+        if type == "CTA Train Station":
+            return get_place_id(old_address, api_key, "CTA Subway Station")
+        print("Unable to get location from address.")
+        return
+
+    gmaps_places_api = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius=10000&type=train_station&key={api_key}"
+    response = requests.get(gmaps_places_api)
+    data = response.json()
+
+    if 'results' in data and len(data['results']) > 0:
+        return data['results'][0]['place_id']
+    else:
+        return None
+
+def get_lat_lng_from_address(address, api_key, type="Train Station"):
+    old_address = address
+    address = f'{address} {type}' if type != 'place' else address
     geocode_api = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
     response = requests.get(geocode_api)
     data = response.json()
+
+    print(address)
+    print(data)
     if 'results' in data and len(data['results']) > 0:
         location = data['results'][0]['geometry']['location']
+
+        if location is None:
+            if type == "Train Station":
+                return get_lat_lng_from_address(old_address, api_key, "Subway Station")
+            if type == "Subway Station":
+                return get_lat_lng_from_address(old_address, api_key, "Station")
+            if type == "Station":
+                return get_lat_lng_from_address(old_address, api_key, "CTA Train Station")
+            if type == "CTA Train Station":
+                return get_lat_lng_from_address(old_address, api_key, "CTA Subway Station")
+            print("Unable to get location from address.")
+            return
         return f"{location['lat']},{location['lng']}"
     else:
         return None
+
+print(get_lat_lng_from_address(get_address_from_name('Seafood City Supermarket', 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM'), 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM', 'place'))
 
 #get_lat_lng_from_address(get_address_from_name("Jackson & Austin Terminal, Northeastbound, Bus Terminal", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM"), "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
 def get_nearest_trains_in_radius(radius, address, api_key):
     radius = convert_miles_to_meters(radius)
-    location = get_lat_lng_from_address(address, api_key)
+    location = get_lat_lng_from_address(address, api_key, 'place')
     nearest_stations = []
 
     if location is None:
         print("Unable to get location from address.")
-        return
+        return None
 
     gmaps_places_api = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius={radius}&type=train_station&key={api_key}"
     response = requests.get(gmaps_places_api)
@@ -169,10 +233,10 @@ def get_nearest_trains_in_radius(radius, address, api_key):
     if 'results' in data:
         for i, result in enumerate(data['results']):
             if find_closest_matching_string_with_fuzzywuzzy(result['name'], cta_to_gmaps_ID_mapping.keys())[1] > 70:
-                '''print(f"Train Station {i + 1}:")
+                print(f"Train Station {i + 1}:")
                 print(f"  Name: {result['name']}")
                 print(f"  Place ID: {result['place_id']}")
-                print(f"  Station ID: {cta_to_gmaps_ID_mapping[result['place_id']]}")'''
+                #print(f"  Station ID: {cta_to_gmaps_ID_mapping[result['place_id']]}")
                 nearest_stations.append((find_closest_matching_string_with_fuzzywuzzy(result['name'], cta_to_gmaps_ID_mapping.keys())[0], result['place_id'], cta_to_gmaps_ID_mapping[find_closest_matching_string_with_fuzzywuzzy(result['name'], cta_to_gmaps_ID_mapping.keys())[0]]))
             else:
                 continue
@@ -181,58 +245,83 @@ def get_nearest_trains_in_radius(radius, address, api_key):
         return nearest_stations
     else:
         print("No train stations found.")
+        return None
 
 # uses get_nearest_trains_in_radius and loops get_common_run_number to find the common train/run/line between two locations
 def get_common_train_between_two_stations(origin, destination, api_key):
-    origin_stations = get_nearest_trains_in_radius(10, origin, api_key)
-    destination_stations = get_nearest_trains_in_radius(10, destination, api_key)
-    common_stations = list(set(origin_stations) & set(destination_stations))
-    if len(common_stations) == 0:
-        print("No common stations found.")
-        return
+    radius = 2
+    origin_stations = get_nearest_trains_in_radius(radius, origin, api_key)
+    destination_stations = get_nearest_trains_in_radius(radius, destination, api_key)
+
+    if len(origin_stations) == 0 or len(destination_stations) == 0:
+        radius += 2
+        origin_stations = get_nearest_trains_in_radius(radius, origin, api_key)
+        destination_stations = get_nearest_trains_in_radius(radius, destination, api_key)
+
+
+    fastest_origin_station = origin_stations[0]
+    fastest_destination_station = destination_stations[0]
+    fastest_time = datetime.datetime.max
+    direction = 'None'
+     #set direction to northbound or southbound deppending on if the origin or the destination is higher up on the map
+    if float(get_lat_lng_from_address(get_address_from_name(origin, api_key), api_key, 'place').split(',')[0]) > float(get_lat_lng_from_address(get_address_from_name(destination, api_key), api_key, 'place').split(',')[0]):
+        direction = 'Southbound'
     else:
-        print(f"Common stations: {common_stations}")
-        fastest_station = common_stations[0]
-        fastest_time = datetime.datetime.max
-        direction = 'None'
-         #set direction to northbound or southbound deppending on if the origin or the destination is higher up on the map
-        if float(get_lat_lng_from_address(origin, api_key).split(',')[0]) > float(get_lat_lng_from_address(destination, api_key).split(',')[0]):
-            direction = 'Southbound'
+        direction = 'Northbound'
+
+    while radius < 20:
+        for origin_station in origin_stations:
+            for destination_station in destination_stations:
+                if origin_station != destination_station:
+                    print(f'Origin station[2]: {origin_station[2]}')
+                    run_number = get_common_run_number(origin_station[2], destination_station[2], direction, "4a8cc4d9702a4087af064b1fc18f00d9")
+                    if run_number is not None:
+                        arrival_time = datetime.datetime.strptime(run_number['Arrival Time'], "%Y-%m-%dT%H:%M:%S")
+                        if arrival_time < fastest_time:
+                            fastest_time = arrival_time
+                            fastest_origin_station = origin_station
+                            fastest_destination_station = destination_station
+                            '''print(f'New fastest time: {fastest_time}')
+                            print(f'New fastest origin station: {fastest_origin_station}')
+                            print(f'New fastest destination station: {fastest_destination_station}')'''
+
+        if fastest_time != datetime.datetime.max:
+            break
         else:
-            direction = 'Northbound'
+            radius += 2
+            origin_stations = get_nearest_trains_in_radius(radius, origin, api_key)
+            destination_stations = get_nearest_trains_in_radius(radius, destination, api_key)
 
-        for station in common_stations:
-            run_number = get_common_run_number(station[2], station[2], direction , "4a8cc4d9702a4087af064b1fc18f00d9")
-            if run_number is not None:
-                print(run_number)
-                arrival_time = datetime.datetime.strptime(run_number['Arrival Time'], "%Y-%m-%dT%H:%M:%S")
-                if arrival_time < fastest_time:
-                    fastest_time = arrival_time
-                    fastest_station = station
-        print(f"Fastest station: {fastest_station}")
-        print(f"Fastest time: {fastest_time}")
+    print(f"Fastest origin station: {fastest_origin_station}")
+    print(f"Fastest destination station: {fastest_destination_station}")
+    print(f"Fastest time: {fastest_time}")
+    print(f'First Uber pickup location: {get_address_from_name(origin, api_key)}')
+    print(f'First Uber dropoff location: {get_address_from_place_ID(fastest_origin_station[1], api_key)}')
+    print(f'Second Uber pickup location: {get_address_from_place_ID(fastest_destination_station[1], api_key)}')
+    print(f'Second Uber dropoff location: {get_address_from_name(destination, api_key)}')
 
-        return fastest_station, fastest_time
+    return fastest_origin_station, fastest_destination_station, fastest_time
 
-get_common_train_between_two_stations("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
-get_routes("5024 w argyle", "5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
+
+origin, destination, time =  get_common_train_between_two_stations(get_address_from_name(origin_stop, "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM"), get_address_from_name(destination_stop, "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM"), "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
+get_routes(origin, destination, "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
 # get_nearest_trains_in_radius(10,"5900 n keating", "AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM")
 
 def get_place_id(address, api_key, type="Train Station"):
-    '''old_address = address
+    old_address = address
     address = f'{address} {type}'
-    print(address)'''
+    print(address)
     location = get_lat_lng_from_address(address, api_key)
     if location is None:
-        '''if type == "Train Station":
+        if type == "Train Station":
             return get_place_id(old_address, api_key, "Subway Station")
         if type == "Subway Station":
             return get_place_id(old_address, api_key, "Station")
         if type == "Station":
             return get_place_id(old_address, api_key, "CTA Train Station")
         if type == "CTA Train Station":
-            return get_place_id(old_address, api_key, "CTA Subway Station")'''
+            return get_place_id(old_address, api_key, "CTA Subway Station")
         print("Unable to get location from address.")
         return
 
