@@ -113,13 +113,19 @@
     </form>
     {% if start and end %}
         <h1>Directions from {{ start }} to {{ end }}</h1>
-        <a href="https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}">Call an Uber</a>
+        <a href="https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ start_lat }}&pickup[longitude]={{ start_long }}&pickup[formatted_address]={{ start }}&dropoff[latitude]={{ stop1_lat }}&dropoff[longitude]={{ stop1_long }}&dropoff[formatted_address]={{ stop1_address }}">Call an Uber to the first station</a>
+        <br>
+        <a href="https://m.uber.com/ul/?client_id=<CLIENT_ID>&action=setPickup&pickup[latitude]={{ stop2_lat }}&pickup[longitude]={{ stop2_long }}&pickup[formatted_address]={{ stop2_address }}&dropoff[latitude]={{ end_lat }}&dropoff[longitude]={{ end_long }}&dropoff[formatted_address]={{ end }}">Call an Uber to the final destination</a>
+        <br>
+        <img src="https://maps.googleapis.com/maps/api/staticmap?size=600x400&path={{ path }}&{{ markers }}&traffic:yes&key={{ api_key }}" alt="Static Map">
+        <!--
         <iframe
             style="border:0"
             loading="lazy"
             allowfullscreen
             src="https://www.google.com/maps/embed/v1/directions?key={{ api_key }}&origin={{ start }}&destination={{ end }}">
         </iframe>
+        -->
     {% endif %}
 </body>
 </html>
