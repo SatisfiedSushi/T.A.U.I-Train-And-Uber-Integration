@@ -1,10 +1,5 @@
-from flask import Flask, Response, render_template, request, send_from_directory
-import json
-
-from MapEmbed import map_inputs
+from flask import Flask, render_template, request
 from GetDirections import *
-
-# from GoogleMapsAPIs import *
 
 api_key = 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM'
 

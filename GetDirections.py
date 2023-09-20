@@ -3,10 +3,18 @@ from datetime import datetime
 import polyline
 import requests
 
-# Replace with your own Google Maps API key
-api_key = 'AIzaSyA6cXymaX959J3CYjXTcNhCTBFTt9qi6pM'
-
 gmaps = googlemaps.Client(key=api_key)
+
+import googlemaps
+
+def map_inputs(lat, long):
+    # Generate markers for location
+    label = 'P'
+    marker_color = 'green'
+    marker = f'markers=color:{marker_color}|label:{label}|{lat},{long}&'
+
+    return marker
+
 
 def get_address_from_lat_lng(latitude, longitude, api_key):
     # Define the Google Maps Geocoding API endpoint
