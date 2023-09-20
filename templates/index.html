@@ -10,11 +10,11 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
         *{
            font-family: "Lucida Console", "Arial", sans-serif;
        }
-       html, label, .click-button, .carousel-button, .input-box{
+       html, label, .click-button, .carousel-button, .input-box, .half-click-button{
            background-color: #1F2833;
            color: #AADAFF;
        }
-       .click-button, .carousel-button, .input-box{
+       .click-button, .carousel-button, .input-box, .half-click-button{
            border: 0.75vh solid #AADAFF;
            border-radius: 0.75vh;
        }
@@ -44,19 +44,25 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
            font-size: 2.5vh;
            border-radius: 0.75vh;
            padding: 0 0;
-           cursor: pointer;
            box-sizing: border-box;
            height: 41vh;
            width: 4vw;
+       }
+       .half-click-button {
+           font-size: 3.5vh;
+           border-radius: 0.75vh;
+           padding: 0 0;
+           box-sizing: border-box;
+           width: 50%;
        }
        .input-box, .click-button {
            width: 100%;
            box-sizing: border-box;
        }
-       input[type="text"], .click-button{
+       input[type="text"], .click-button, .half-click-button{
            padding: 0.125vh;
        }
-       input, .click-button, .input-box{
+       input, .click-button, .input-box, .half-click-button{
            font-size: 3.75vh;
            margin-bottom: 0.5vh;
            margin-top: 0;
@@ -185,7 +191,13 @@ addresses are provided, it displays directions, links to call an Uber, and a sta
                <button class="carousel-button" id="next-button">&gt</button>
            </div>
        </div>
-       <button class="click-button" id="deeplink-button">Call an Uber</button>
+        <div class="button-container">
+            <div id="double-deeplink-button">
+               <button class="half-click-button" id="double-uber-button">Call an Uber</button>
+               <button class="half-click-button" id="double-google-button">Call an Uber</button>
+            </div>
+            <button class="click-button" id="deeplink-button">Call an Uber</button>
+       </div>
     {% endif %}
     <script>
        const iframes = document.querySelectorAll('.carousel-iframe');
